@@ -12,12 +12,15 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 
 export default function Chat() {
   const [input, setInput] = useState('');
-  const { messages, sendMessage, status } = useChat();
+  const { messages, sendMessage, status, error } = useChat();
 
   const isAILoading = status === 'submitted' || status === 'streaming';
 
   return (
     <main className="flex flex-col items-center justify-between min-h-screen px-4 py-6 sm:p-24">
+      {error && (
+        <div className="text-red-500 mb-4">{error.message}</div>
+      )}
       <ScrollArea className="h-full w-full lg:max-w-4xl sm:max-w-full p-4">
         {messages.map(message => (
           <div key={message.id} className="mb-8 whitespace-pre-wrap">

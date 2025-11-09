@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { streamText, UIMessage, convertToModelMessages } from 'ai';
+import { streamText, UIMessage, convertToModelMessages, NoSuchToolError, InvalidToolInputError } from 'ai';
 
 export const maxDuration = 30;
 
@@ -11,5 +11,15 @@ export async function POST(req: Request) {
         messages: convertToModelMessages(messages),
     });
 
-    return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse({
+        onError: error => {
+            if (NoSuchToolError.isInstance(error)) {
+                return 'The model tried to call an unknown tool.';
+            } else if (InvalidToolInputError.isInstance(error)) {
+                return 'The model called a tool with invalid inputs.';
+            } else {
+                return 'An unknown error occurred.';
+            }
+        },
+    });
 }
