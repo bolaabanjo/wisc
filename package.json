@@ -13,6 +13,7 @@
     "@ai-sdk/react": "^2.0.89",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-slot": "^1.2.4",
+    "@supabase/supabase-js": "^2.80.0",
     "ai": "^5.0.89",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

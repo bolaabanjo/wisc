@@ -15,11 +15,22 @@ export default function Chat() {
       <ScrollArea className="h-[400px] w-full max-w-md rounded-md border p-4">
         {messages.map(message => (
           <div key={message.id} className="mb-4 whitespace-pre-wrap">
-            {message.role === 'user' ? 'User: ' : 'AI: '}
+            {message.role === 'user' ? '' : 'Wisc: '}
             {message.parts.map((part, i) => {
               switch (part.type) {
                 case 'text':
-                  return <div key={`${message.id}-${i}`}>{part.text}</div>;
+                  return (
+                    <div
+                      key={`${message.id}-${i}`}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`p-2 rounded-lg ${message.role === 'user' ? 'bg-zinc-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+                      >
+                        {part.text}
+                      </div>
+                    </div>
+                  );
               }
             })}
           </div>
