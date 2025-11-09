@@ -1,7 +1,7 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { InputGroup, InputGroupInput, InputGroupButton } from '@/components/ui/input-group';
 import { ArrowUp } from 'lucide-react';
@@ -13,8 +13,17 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 export default function Chat() {
   const [input, setInput] = useState('');
   const { messages, sendMessage, status, error } = useChat();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const isAILoading = status === 'submitted' || status === 'streaming';
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <main className="flex flex-col items-center justify-between min-h-screen px-4 py-6 dark:bg-zinc-900 sm:p-24">
@@ -64,6 +73,7 @@ export default function Chat() {
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </ScrollArea>
 
       <form
@@ -74,7 +84,7 @@ export default function Chat() {
         }}
         className="fixed bottom-0 flex w-full lg:max-w-4xl md:max-w-3xl sm:max-w-full pb-6 bg-white dark:bg-zinc-900"
       >
-        <InputGroup className="flex-grow mr-2 ml-2 pr-2 pl-2 sm:mr-2 sm:ml-2 h-14 rounded-4xl dark:bg-zinc-800">
+        <InputGroup className="flex-grow mr-4 ml-4 pr-2 pl-2 sm:mr-2 sm:ml-2 h-14 rounded-4xl dark:bg-zinc-800">
           <InputGroupInput
             value={input}
             placeholder="Ask anything"
