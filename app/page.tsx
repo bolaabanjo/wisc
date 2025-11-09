@@ -17,7 +17,7 @@ export default function Chat() {
   const isAILoading = status === 'submitted' || status === 'streaming';
 
   return (
-    <main className="flex flex-col items-center justify-between min-h-screen px-4 py-6 sm:p-24">
+    <main className="flex flex-col items-center justify-between min-h-screen px-4 py-6 dark:bg-zinc-900 sm:p-24">
       {error && (
         <div className="text-red-500 mb-4">{error.message}</div>
       )}
@@ -34,7 +34,7 @@ export default function Chat() {
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`py-2 px-3 rounded-4xl ${message.role === 'user' ? 'bg-zinc-300 text-black' : ''}`}
+                          className={`py-2 px-3 rounded-4xl ${message.role === 'user' ? 'bg-zinc-300 text-black dark:bg-zinc-800 dark:text-white' : ''}`}
                         >
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {part.text}
@@ -72,16 +72,16 @@ export default function Chat() {
           sendMessage({ text: input });
           setInput('');
         }}
-        className="fixed bottom-0 flex w-full lg:max-w-4xl md:max-w-3xl sm:max-w-full p-6 bg-white dark:bg-black"
+        className="fixed bottom-0 flex w-full lg:max-w-4xl md:max-w-3xl sm:max-w-full pb-6 bg-white dark:bg-zinc-900"
       >
-        <InputGroup className="flex-grow mr-2 pr-2 pl-2 h-14 rounded-4xl">
+        <InputGroup className="flex-grow mr-2 pr-2 pl-2 h-14 rounded-4xl dark:bg-zinc-800">
           <InputGroupInput
             value={input}
             placeholder="Ask anything"
             onChange={e => setInput(e.currentTarget.value)}
           />
-          <InputGroupButton type="submit" className="bg-black text-white font-bold rounded-full h-10 w-10 cursor-pointer">
-            <ArrowUp className="size-6" />
+          <InputGroupButton type="submit" className="bg-black dark:bg-white text-white dark:text-black font-bold rounded-full h-10 w-10 cursor-pointer">
+            <ArrowUp className="size-6"/>
           </InputGroupButton>
         </InputGroup>
       </form>
