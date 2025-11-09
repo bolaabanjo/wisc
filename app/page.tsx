@@ -74,7 +74,7 @@ export default function Chat() {
         }}
         className="fixed bottom-0 flex w-full lg:max-w-4xl md:max-w-3xl sm:max-w-full pb-6 bg-white dark:bg-zinc-900"
       >
-        <InputGroup className="flex-grow mr-2 pr-2 pl-2 h-14 rounded-4xl dark:bg-zinc-800">
+        <InputGroup className="flex-grow mr-2 ml-2 pr-2 pl-2 sm:mr-2 sm:ml-2 h-14 rounded-4xl dark:bg-zinc-800">
           <InputGroupInput
             value={input}
             placeholder="Ask anything"
