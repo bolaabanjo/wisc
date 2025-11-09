@@ -21,7 +21,7 @@ export default function Chat() {
       {error && (
         <div className="text-red-500 mb-4">{error.message}</div>
       )}
-      <ScrollArea className="h-full w-full lg:max-w-4xl sm:max-w-full p-4">
+      <ScrollArea className="h-full w-full lg:max-w-4xl sm:w-full p-4">
         {messages.map(message => (
           <div key={message.id} className="mb-8 whitespace-pre-wrap">
             {message.role === 'user' ? '' : ''}
