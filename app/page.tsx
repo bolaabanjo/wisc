@@ -38,7 +38,7 @@ export default function Chat() {
               switch (part.type) {
                 case 'text':
                   return (
-                    <div key={`${message.id}-${i}`} className="flex flex-col">
+                    <div key={`${message.id}-${i}`} className="flex flex-col pb-4">
                       <div
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
