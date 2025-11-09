@@ -15,7 +15,7 @@ export default function Chat() {
       <ScrollArea className="h-[400px] w-full max-w-md rounded-md border p-4">
         {messages.map(message => (
           <div key={message.id} className="mb-4 whitespace-pre-wrap">
-            {message.role === 'user' ? '' : 'Wisc: '}
+            {message.role === 'user' ? '' : 'Israel: '}
             {message.parts.map((part, i) => {
               switch (part.type) {
                 case 'text':
