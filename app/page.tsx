@@ -213,7 +213,7 @@ export default function Chat() {
     setInput('');
     setSelectedFile(null);
   }}
-  className="fixed bottom-0 left-1/2 transform -translate-x-1/2 flex justify-center w-full max-w-4xl pb-6 bg-white dark:bg-zinc-900"
+  className="fixed bottom-0 left-1/2 transform -translate-x-1/2 flex justify-center w-full max-w-4xl pb-6 bg-white dark:bg-zinc-900 z-50"
 >
   <InputGroup className="relative flex-grow mx-4 h-14 rounded-4xl dark:bg-zinc-800 max-w-3xl pr-2 pl-2 overflow-visible">
     <label htmlFor="file-input" className="flex items-center justify-center h-10 w-10 cursor-pointer text-gray-500 hover:text-gray-700">
