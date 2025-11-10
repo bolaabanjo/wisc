@@ -81,7 +81,7 @@ export default function Chat() {
                             rehypePlugins={[rehypeRaw]}
                             components={{
                               p: ({ node, ...props }) => (
-                                <p className="mb-2 last:mb-0" {...props} />
+                                <p className="mb-2 last:mb-0 text-sm" {...props} />
                               ),
                               h1: ({ node, ...props }) => (
                                 <h1 className="text-3xl font-bold mt-6 mb-4" {...props} />
@@ -130,7 +130,7 @@ export default function Chat() {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700" {...props} />
                               ),
                               td: ({ node, ...props }) => (
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700" {...props} />
+                                <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700" {...props} />
                               ),
                             }}
                           >
