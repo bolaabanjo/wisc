@@ -1,5 +1,6 @@
 import { google } from '@ai-sdk/google';
 import { streamText, UIMessage, convertToModelMessages, NoSuchToolError, InvalidToolInputError } from 'ai';
+import { googleTools } from '@ai-sdk/google/internal';
 
 export const maxDuration = 30;
 
@@ -7,8 +8,11 @@ export async function POST(req: Request) {
     const { messages }: { messages: UIMessage[] } = await req.json();
 
     const result = streamText({
-        model: google('gemini-2.5-pro'),
+        model: google('gemini-2.5-flash'),
         messages: convertToModelMessages(messages),
+        tools: {
+            google_search: google.tools.googleSearch({}),
+        },
     });
 
     return result.toUIMessageStreamResponse({
