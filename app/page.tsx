@@ -81,25 +81,28 @@ export default function Chat() {
                             rehypePlugins={[rehypeRaw]}
                             components={{
                               p: ({ node, ...props }) => (
-                                <p className="mb-2 last:mb-0 text-sm" {...props} />
+                                <p className="leading-relaxed sm:text-sm" {...props} />
                               ),
                               h1: ({ node, ...props }) => (
-                                <h1 className="text-3xl font-bold mt-6 mb-4" {...props} />
+                                <h1 className="text-3xl font-bold" {...props} />
                               ),
                               h2: ({ node, ...props }) => (
-                                <h2 className="text-2xl font-bold mt-5 mb-3" {...props} />
+                                <h2 className="text-2xl font-bold" {...props} />
                               ),
                               h3: ({ node, ...props }) => (
-                                <h3 className="text-xl font-bold mt-4 mb-2" {...props} />
+                                <h3 className="text-xl font-bold" {...props} />
                               ),
                               ul: ({ node, ...props }) => (
-                                <ul className="list-disc list-inside mb-2 pl-4" {...props} />
+                                <ul className="list-disc list-outside pl-2" {...props} />
                               ),
                               ol: ({ node, ...props }) => (
-                                <ol className="list-decimal list-inside mb-2 pl-4" {...props} />
+                                <ol className="list-decimal list-outside pl-2" {...props} />
                               ),
                               li: ({ node, ...props }) => (
-                                <li className="mb-1" {...props} />
+                                <li className="" {...props} />
+                              ),
+                              hr: ({ node, ...props }) => (
+                                <hr className="my-4 border-t border-gray-300 dark:border-gray-700" {...props} />
                               ),
                               a: ({ node, ...props }) => (
                                 <a className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />
@@ -119,9 +122,9 @@ export default function Chat() {
                                 );
                               },
                               table: ({ node, ...props }) => (
-                                <div className="overflow-x-auto my-2">
+                                <ScrollArea className="my-2">
                                   <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-md" {...props} />
-                                </div>
+                                </ScrollArea>
                               ),
                               thead: ({ node, ...props }) => (
                                 <thead className="bg-gray-50 dark:bg-gray-800" {...props} />
@@ -130,7 +133,7 @@ export default function Chat() {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700" {...props} />
                               ),
                               td: ({ node, ...props }) => (
-                                <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700" {...props} />
+                                <td className="px-6 py-4 whitespace-nowrap lg:text-sm sm:text-xs text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700" {...props} />
                               ),
                             }}
                           >
@@ -229,7 +232,7 @@ export default function Chat() {
       value={input}
       placeholder="Ask anything"
       onChange={e => setInput(e.currentTarget.value)}
-      className='pl-0'
+      className="sm:text-sm pl-0"
     />
     <InputGroupButton type="submit" className="bg-black dark:bg-white text-white dark:text-black pl-4 font-bold rounded-full h-10 w-10 cursor-pointer">
       <ArrowUp className="size-6"/>

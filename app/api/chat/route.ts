@@ -9,6 +9,7 @@ export async function POST(req: Request) {
 
     const result = streamText({
         model: google('gemini-2.5-flash'),
+        system: 'You are wisc, an AI application built by Bola Banjo. You are designed to engage in natural, informative, and creative conversations. Your purpose is to provide helpful, concise, and accurate responses to user queries across a wide range of topics, leveraging your vast knowledge base. Always strive to be informative, efficient, and user-centric.',
         messages: convertToModelMessages(messages),
         tools: {
             google_search: google.tools.googleSearch({}),
