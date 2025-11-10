@@ -74,7 +74,7 @@ export default function Chat() {
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`py-2 px-5 rounded-4xl ${message.role === 'user' ? 'bg-zinc-300 text-black dark:bg-zinc-800 dark:text-white' : ''}`}
+                          className={`py-2 px-5 rounded-4xl ${message.role === 'user' ? 'bg-zinc-300 text-black dark:bg-zinc-800 dark:text-white max-w-xs md:max-w-md' : 'pl-1'}`}
                         >
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
@@ -140,7 +140,7 @@ export default function Chat() {
                       </div>
                       {message.role === 'assistant' && !isAILoading && (
                         <button
-                          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mt-1 ml-4 cursor-pointer"
+                          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mt-1 ml-2 cursor-pointer"
                           onClick={() => navigator.clipboard.writeText(part.text)}
                         >
                           <Copy className="size-4" />
