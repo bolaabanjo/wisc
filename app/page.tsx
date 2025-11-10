@@ -10,6 +10,7 @@ import remarkGfm from 'remark-gfm';
 import { Copy } from 'lucide-react';
 import { Plus } from 'lucide-react';
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import rehypeRaw from 'rehype-raw';
 
 export default function Chat() {
   const [input, setInput] = useState('');
@@ -73,9 +74,66 @@ export default function Chat() {
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`p-4 ${message.role === 'user' ? 'py-2 px-5 rounded-4xl bg-zinc-300 text-black dark:bg-zinc-800 dark:text-white' : ''}`}
+                          className={`py-2 px-5 rounded-4xl ${message.role === 'user' ? 'bg-zinc-300 text-black dark:bg-zinc-800 dark:text-white' : ''}`}
                         >
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw]}
+                            components={{
+                              p: ({ node, ...props }) => (
+                                <p className="mb-2 last:mb-0" {...props} />
+                              ),
+                              h1: ({ node, ...props }) => (
+                                <h1 className="text-3xl font-bold mt-6 mb-4" {...props} />
+                              ),
+                              h2: ({ node, ...props }) => (
+                                <h2 className="text-2xl font-bold mt-5 mb-3" {...props} />
+                              ),
+                              h3: ({ node, ...props }) => (
+                                <h3 className="text-xl font-bold mt-4 mb-2" {...props} />
+                              ),
+                              ul: ({ node, ...props }) => (
+                                <ul className="list-disc list-inside mb-2 pl-4" {...props} />
+                              ),
+                              ol: ({ node, ...props }) => (
+                                <ol className="list-decimal list-inside mb-2 pl-4" {...props} />
+                              ),
+                              li: ({ node, ...props }) => (
+                                <li className="mb-1" {...props} />
+                              ),
+                              a: ({ node, ...props }) => (
+                                <a className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />
+                              ),
+                              code: ({ node, className, children, ...props }) => {
+                                const match = /language-(\w+)/.exec(className || '');
+                                return match ? (
+                                  <pre className="bg-gray-800 text-white p-2 rounded-md overflow-x-auto my-2">
+                                    <code className={className} {...props}>
+                                      {children}
+                                    </code>
+                                  </pre>
+                                ) : (
+                                  <code className="bg-gray-200 dark:bg-gray-700 rounded-md px-1 py-0.5 text-sm" {...props}>
+                                    {children}
+                                  </code>
+                                );
+                              },
+                              table: ({ node, ...props }) => (
+                                <div className="overflow-x-auto my-2">
+                                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-md" {...props} />
+                                </div>
+                              ),
+                              thead: ({ node, ...props }) => (
+                                <thead className="bg-gray-50 dark:bg-gray-800" {...props} />
+                              ),
+                              th: ({ node, ...props }) => (
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700" {...props} />
+                              ),
+                              td: ({ node, ...props }) => (
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700" {...props} />
+                              ),
+                            }}
+                          >
                             {part.text}
                           </ReactMarkdown>
                         </div>
@@ -90,6 +148,8 @@ export default function Chat() {
                       )}
                     </div>
                   );
+                default:
+                  return null;
               }
             })}
           </div>
@@ -128,53 +188,54 @@ export default function Chat() {
         </div>
       )}
 
-      <form
-        onSubmit={async e => {
-          e.preventDefault();
-          if (input.trim() === '' && !selectedFile) return;
+<form
+  onSubmit={async e => {
+    e.preventDefault();
+    if (input.trim() === '' && !selectedFile) return;
 
-          const parts: ({ type: 'text'; text: string } | { type: 'file'; mediaType: string; data: string; url: string })[] = [];
+    const parts: ({ type: 'text'; text: string } | { type: 'file'; mediaType: string; data: string; url: string })[] = [];
 
-          if (input.trim() !== '') {
-            parts.push({ type: 'text', text: input });
-          }
+    if (input.trim() !== '') {
+      parts.push({ type: 'text', text: input });
+    }
 
-          if (selectedFile) {
-            const base64Content = await fileToBase64(selectedFile);
-            parts.push({
-              type: 'file',
-              mediaType: selectedFile.type,
-              data: base64Content,
-              url: '', // Dummy URL to satisfy FileUIPart requirement
-            });
-          }
+    if (selectedFile) {
+      const base64Content = await fileToBase64(selectedFile);
+      parts.push({
+        type: 'file',
+        mediaType: selectedFile.type,
+        data: base64Content,
+        url: '', // Dummy URL to satisfy FileUIPart requirement
+      });
+    }
 
-          sendMessage({ parts });
-          setInput('');
-          setSelectedFile(null);
-        }}
-        className="fixed bottom-0 flex w-full lg:max-w-4xl  sm:max-w-full pb-6 bg-white dark:bg-zinc-900"
-      >
-        <InputGroup className="flex-grow mr-4 ml-4 justify-center pr-2 pl-2 sm:mr-2 sm:ml-2 h-14 rounded-4xl dark:bg-zinc-800">
-          <label htmlFor="file-input" className="flex items-center justify-center h-10 w-10 cursor-pointer text-gray-500 hover:text-gray-700">
-            <Plus className="size-5" />
-          </label>
-          <input
-            id="file-input"
-            type="file"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <InputGroupInput
-            value={input}
-            placeholder="Ask anything"
-            onChange={e => setInput(e.currentTarget.value)}
-          />
-          <InputGroupButton type="submit" className="bg-black dark:bg-white text-white dark:text-black font-bold rounded-full h-10 w-10 cursor-pointer">
-            <ArrowUp className="size-6"/>
-          </InputGroupButton>
-        </InputGroup>
-      </form>
+    sendMessage({ parts });
+    setInput('');
+    setSelectedFile(null);
+  }}
+  className="fixed bottom-0 left-1/2 transform -translate-x-1/2 flex justify-center w-full max-w-4xl pb-6 bg-white dark:bg-zinc-900"
+>
+  <InputGroup className="relative flex-grow mx-4 h-14 rounded-4xl dark:bg-zinc-800 max-w-3xl pr-2 pl-2 overflow-visible">
+    <label htmlFor="file-input" className="flex items-center justify-center h-10 w-10 cursor-pointer text-gray-500 hover:text-gray-700">
+      <Plus className="size-5" />
+    </label>
+    <input
+      id="file-input"
+      type="file"
+      className="hidden"
+      onChange={handleFileChange}
+    />
+    <InputGroupInput
+      value={input}
+      placeholder="Ask anything"
+      onChange={e => setInput(e.currentTarget.value)}
+      className='pl-0'
+    />
+    <InputGroupButton type="submit" className="bg-black dark:bg-white text-white dark:text-black pl-4 font-bold rounded-full h-10 w-10 cursor-pointer">
+      <ArrowUp className="size-6"/>
+    </InputGroupButton>
+  </InputGroup>
+</form>
     </main>
   );
 }
