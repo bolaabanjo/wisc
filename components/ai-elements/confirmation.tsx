@@ -13,30 +13,30 @@ import {
 
 type ToolUIPartApproval =
   | {
-      id: string;
-      approved?: never;
-      reason?: never;
-    }
+    id: string;
+    approved?: never;
+    reason?: never;
+  }
   | {
-      id: string;
-      approved: boolean;
-      reason?: string;
-    }
+    id: string;
+    approved: boolean;
+    reason?: string;
+  }
   | {
-      id: string;
-      approved: true;
-      reason?: string;
-    }
+    id: string;
+    approved: true;
+    reason?: string;
+  }
   | {
-      id: string;
-      approved: true;
-      reason?: string;
-    }
+    id: string;
+    approved: true;
+    reason?: string;
+  }
   | {
-      id: string;
-      approved: false;
-      reason?: string;
-    }
+    id: string;
+    approved: false;
+    reason?: string;
+  }
   | undefined;
 
 type ConfirmationContextValue = {
@@ -94,10 +94,10 @@ export type ConfirmationRequestProps = {
 };
 
 export const ConfirmationRequest = ({ children }: ConfirmationRequestProps) => {
-  const { state } = useConfirmation();
+  const { approval } = useConfirmation();
 
-  // Only show when approval is requested
-  if (state !== "approval-requested") {
+  // Only show when approval is pending (neither approved nor denied)
+  if (approval?.approved !== undefined) {
     return null;
   }
 
@@ -113,12 +113,10 @@ export const ConfirmationAccepted = ({
 }: ConfirmationAcceptedProps) => {
   const { approval, state } = useConfirmation();
 
-  // Only show when approved and in response states
+  // Only show when approved and output is available
   if (
     !approval?.approved ||
-    (state !== "approval-responded" &&
-      state !== "output-denied" &&
-      state !== "output-available")
+    (state !== "output-available" && state !== "output-error")
   ) {
     return null;
   }
@@ -135,12 +133,10 @@ export const ConfirmationRejected = ({
 }: ConfirmationRejectedProps) => {
   const { approval, state } = useConfirmation();
 
-  // Only show when rejected and in response states
+  // Only show when rejected and output is available or error
   if (
     approval?.approved !== false ||
-    (state !== "approval-responded" &&
-      state !== "output-denied" &&
-      state !== "output-available")
+    (state !== "output-available" && state !== "output-error")
   ) {
     return null;
   }
@@ -154,10 +150,10 @@ export const ConfirmationActions = ({
   className,
   ...props
 }: ConfirmationActionsProps) => {
-  const { state } = useConfirmation();
+  const { approval } = useConfirmation();
 
-  // Only show when approval is requested
-  if (state !== "approval-requested") {
+  // Only show when approval is pending (neither approved nor denied)
+  if (approval?.approved !== undefined) {
     return null;
   }
 
