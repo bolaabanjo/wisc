@@ -1,30 +1,108 @@
 import { google } from '@ai-sdk/google';
-import { streamText, UIMessage, convertToModelMessages, NoSuchToolError, InvalidToolInputError } from 'ai';
-import { googleTools } from '@ai-sdk/google/internal';
+import { streamText, convertToModelMessages, UIMessage } from 'ai';
+import { CencoriClient, SafetyError, RateLimitError, AuthenticationError } from 'cencori';
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
     const { messages }: { messages: UIMessage[] } = await req.json();
 
-    const result = streamText({
-        model: google('gemini-2.5-flash'),
-        system: 'You are wisc, an AI application built by Bola Banjo. You are designed to engage in natural, informative, and creative conversations. Your purpose is to provide helpful, concise, and accurate responses to user queries across a wide range of topics, leveraging your vast knowledge base. Always strive to be informative, efficient, and user-centric.',
-        messages: convertToModelMessages(messages),
-        tools: {
-            google_search: google.tools.googleSearch({}),
-        },
+    const cencori = new CencoriClient({
+        apiKey: process.env.CENCORI_API_KEY!,
+        // Use deployed URL or localhost for testing
+        baseUrl: process.env.CENCORI_BASE_URL || 'https://cencori.vercel.app'
     });
 
-    return result.toUIMessageStreamResponse({
-        onError: error => {
-            if (NoSuchToolError.isInstance(error)) {
-                return 'The model tried to call an unknown tool.';
-            } else if (InvalidToolInputError.isInstance(error)) {
-                return 'The model called a tool with invalid inputs.';
-            } else {
-                return 'An unknown error occurred.';
+    try {
+        // Step 1: Run safety checks through Cencori
+        const latestUserMessage = messages.filter((m) => m.role === 'user').pop();
+
+        if (latestUserMessage) {
+            // Convert UIMessage to a format we can work with
+            const convertedMessages = convertToModelMessages([latestUserMessage]);
+            const lastMessage = convertedMessages[0];
+
+            // Extract text content from the message
+            let textContent = '';
+            if (lastMessage && typeof lastMessage.content === 'string') {
+                textContent = lastMessage.content;
+            } else if (lastMessage && Array.isArray(lastMessage.content)) {
+                // Handle multipart content (text + images, etc.)
+                textContent = lastMessage.content
+                    .filter((part) => part.type === 'text')
+                    .map((part) => part.text)
+                    .join(' ');
             }
-        },
-    });
+
+            if (textContent) {
+                // This call to Cencori will:
+                // ✅ Block PII (emails, phone numbers, SSNs, credit cards)
+                // ✅ Block harmful keywords
+                // ✅ Block prompt injection attempts
+                // ✅ Enforce rate limits (60 req/min)
+                // ✅ Log to your analytics dashboard
+                await cencori.ai.chat({
+                    messages: [
+                        { role: 'user', content: textContent }
+                    ]
+                });
+                // If we reach here, content is safe ✅
+            }
+        }
+
+        // Step 2: Stream response with Google SDK (for tools & streaming)
+        const result = await streamText({
+            model: google('gemini-2.5-flash'),
+            system: 'You are Wisc, an AI assistant built by Bola Banjo.',
+            messages: convertToModelMessages(messages),
+            tools: {
+                google_search: google.tools.googleSearch({}),
+            },
+        });
+
+        return result.toUIMessageStreamResponse();
+
+    } catch (error) {
+
+        if (error instanceof SafetyError) {
+            return new Response(
+                JSON.stringify({
+                    error: 'Content blocked',
+                    reasons: error.reasons,
+                    message: 'Your message contains sensitive content.'
+                }),
+                { status: 400, headers: { 'Content-Type': 'application/json' } }
+            );
+        }
+
+        if (error instanceof RateLimitError) {
+            return new Response(
+                JSON.stringify({
+                    error: 'Too many requests',
+                    message: 'Please slow down and try again later.'
+                }),
+                { status: 429, headers: { 'Content-Type': 'application/json' } }
+            );
+        }
+
+        if (error instanceof AuthenticationError) {
+            return new Response(
+                JSON.stringify({
+                    error: 'Authentication failed',
+                    message: 'Invalid API key.'
+                }),
+                { status: 401, headers: { 'Content-Type': 'application/json' } }
+            );
+        }
+
+        // Unknown error - log for debugging
+        console.error('Cencori Error:', error);
+        return new Response(
+            JSON.stringify({
+                error: 'Internal error',
+                message: error instanceof Error ? error.message : 'Unknown error'
+            }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+    }
 }
