@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const cencori = new CencoriClient({
         apiKey: process.env.CENCORI_API_KEY!,
         // Use deployed URL or localhost for testing
-        baseUrl: process.env.CENCORI_BASE_URL || 'https://cencori.vercel.app'
+        baseUrl: process.env.CENCORI_BASE_URL || 'https://cencori.com'
     });
 
     try {
