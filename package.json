@@ -25,7 +25,7 @@
     "@supabase/supabase-js": "^2.80.0",
     "@xyflow/react": "^12.9.2",
     "ai": "^5.0.89",
-    "cencori": "^0.1.2",
+    "cencori": "^0.3.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

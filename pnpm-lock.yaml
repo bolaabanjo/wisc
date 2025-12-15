@@ -57,8 +57,8 @@ importers:
         specifier: ^5.0.89
         version: 5.0.89(zod@4.1.12)
       cencori:
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: ^0.3.1
+        version: 0.3.1
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1631,8 +1631,8 @@ packages:
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
 
-  cencori@0.1.2:
-    resolution: {integrity: sha512-jkPsR5hkTyRWF8YUdnEzF7ny8zR7LOoP4W3RePO1ugci1+U9TOtg1iwnls/+avHdgD6C9UF4Eiw+zMEQdm+iZQ==}
+  cencori@0.3.1:
+    resolution: {integrity: sha512-Wjruf4dIlpwVAqRkXkpNj2bIVQtTrc5uliam+rdWwgUb20A2Av0PXrpFuMd/WE0Bd75FRhuEo8wiWx6VV6kAVg==}
 
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
@@ -5187,7 +5187,7 @@ snapshots:
 
   ccount@2.0.1: {}
 
-  cencori@0.1.2: {}
+  cencori@0.3.1: {}
 
   chalk@4.1.2:
     dependencies:

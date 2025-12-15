@@ -1,17 +1,12 @@
 import { google } from '@ai-sdk/google';
 import { streamText, convertToModelMessages, UIMessage } from 'ai';
-import { CencoriClient, SafetyError, RateLimitError, AuthenticationError } from 'cencori';
+import { SafetyError, RateLimitError, AuthenticationError } from 'cencori';
+import { cencori } from '@/lib/cencori';
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
     const { messages }: { messages: UIMessage[] } = await req.json();
-
-    const cencori = new CencoriClient({
-        apiKey: process.env.CENCORI_API_KEY!,
-        // Use deployed URL or localhost for testing
-        baseUrl: process.env.CENCORI_BASE_URL || 'https://cencori.com'
-    });
 
     try {
         // Step 1: Run safety checks through Cencori
