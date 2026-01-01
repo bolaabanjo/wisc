@@ -25,7 +25,6 @@ export async function POST(req: Request) {
             return { role: m.role as 'user' | 'assistant' | 'system', content };
         });
 
-        // Add system prompt
         const systemPrompt = `You are Wisc, an AI assistant built by Bola Banjo. 
 
 IMPORTANT IDENTITY RULES:
@@ -33,15 +32,10 @@ IMPORTANT IDENTITY RULES:
 - You were created by Bola Banjo, NOT by Google, NOT by OpenAI, NOT by Anthropic.
 - If asked who made you, who built you, or who created you, always say "Bola Banjo".
 - If asked what AI you are, say you are "Wisc".
-- Never mention being trained by Google or any other company.
 - You are a helpful, friendly assistant.`;
 
-        // Route through Cencori - this handles:
-        // ✅ Safety/content filtering
-        // ✅ Rate limiting  
-        // ✅ Analytics logging
-        // ✅ Cost tracking
-        const response = await cencori.ai.chat({
+        // Stream through Cencori
+        const stream = await cencori.ai.chatStream({
             model: 'gemini-2.5-flash',
             messages: [
                 { role: 'system', content: systemPrompt },
@@ -49,67 +43,64 @@ IMPORTANT IDENTITY RULES:
             ]
         });
 
-        // Return as streaming response (Cencori returns full response, we fake stream it)
+        // Transform to AI SDK format
         const encoder = new TextEncoder();
-        const stream = new ReadableStream({
-            start(controller) {
-                // Send content as a single chunk
-                const data = JSON.stringify({
-                    role: 'assistant',
-                    content: response.content
+        const readable = new ReadableStream({
+            async start(controller) {
+                let fullContent = '';
+                
+                for await (const chunk of stream) {
+                    fullContent += chunk.delta;
+                    
+                    // Send in AI SDK's expected format
+                    const data = JSON.stringify({
+                        type: 'text-delta',
+                        textDelta: chunk.delta
+                    });
+                    controller.enqueue(encoder.encode(`0:${data}\n`));
+                }
+                
+                // Send finish message
+                const finishData = JSON.stringify({
+                    type: 'finish',
+                    finishReason: 'stop'
                 });
-                controller.enqueue(encoder.encode(`data: ${data}\n\n`));
+                controller.enqueue(encoder.encode(`d:${finishData}\n`));
                 controller.close();
             }
         });
 
-        return new Response(stream, {
+        return new Response(readable, {
             headers: {
-                'Content-Type': 'text/event-stream',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive'
+                'Content-Type': 'text/plain; charset=utf-8',
+                'X-Vercel-AI-Data-Stream': 'v1'
             }
         });
 
     } catch (error) {
         if (error instanceof SafetyError) {
-            return new Response(
-                JSON.stringify({
-                    error: 'Content blocked',
-                    reasons: error.reasons,
-                    message: 'Your message contains sensitive content.'
-                }),
-                { status: 400, headers: { 'Content-Type': 'application/json' } }
+            return Response.json(
+                { error: 'Content blocked', message: 'Your message contains sensitive content.' },
+                { status: 400 }
             );
         }
-
         if (error instanceof RateLimitError) {
-            return new Response(
-                JSON.stringify({
-                    error: 'Too many requests',
-                    message: 'Please slow down and try again later.'
-                }),
-                { status: 429, headers: { 'Content-Type': 'application/json' } }
+            return Response.json(
+                { error: 'Too many requests', message: 'Please slow down.' },
+                { status: 429 }
             );
         }
-
         if (error instanceof AuthenticationError) {
-            return new Response(
-                JSON.stringify({
-                    error: 'Authentication failed',
-                    message: 'Invalid API key.'
-                }),
-                { status: 401, headers: { 'Content-Type': 'application/json' } }
+            return Response.json(
+                { error: 'Authentication failed', message: 'Invalid API key.' },
+                { status: 401 }
             );
         }
 
         console.error('Chat Error:', error);
-        return new Response(
-            JSON.stringify({
-                error: 'Internal error',
-                message: error instanceof Error ? error.message : 'Unknown error'
-            }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
+        return Response.json(
+            { error: 'Internal error', message: error instanceof Error ? error.message : 'Unknown' },
+            { status: 500 }
         );
     }
 }
