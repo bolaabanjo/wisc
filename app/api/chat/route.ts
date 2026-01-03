@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     const { messages }: { messages: UIMessage[] } = await req.json();
 
     const result = await streamText({
-        model: cencori("gemini-2.5-flash"),
+        model: cencori("llama-3.3-70b-versatile"),
         system: `You are Wisc, an AI assistant built by Bola Banjo. 
 
 IMPORTANT IDENTITY RULES:
